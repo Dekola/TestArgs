@@ -8,12 +8,15 @@ import com.dekola.dekk22.data.model.ProductPresentation
 import com.dekola.dekk22.data.remoteDataSource.Result
 import com.dekola.dekk22.data.repository.IProductRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ProductViewModel @Inject constructor(private val productRepository: IProductRepository) :
     ViewModel() {
+
+    var testMessage: String? = null
 
     private val _loadLiveData = MutableLiveData<Boolean>()
     val loadLiveData:LiveData<Boolean> = _loadLiveData
@@ -30,6 +33,24 @@ class ProductViewModel @Inject constructor(private val productRepository: IProdu
                 }
                 is Result.Success -> {
                     _productsResult.postValue(ProductsResult(success = productsResult.data))
+                }
+            }
+            _loadLiveData.postValue(false)
+        }
+    }
+
+    private fun getProductsFlow() {
+        viewModelScope.launch {
+            _loadLiveData.postValue(true)
+
+            productRepository.getProductsFlow().collect { popularProductsResult->
+                when (popularProductsResult) {
+                    is Result.Error -> {
+                        _productsResult.postValue(ProductsResult(errorMessage = popularProductsResult.errorMessage))
+                    }
+                    is Result.Success -> {
+                        _productsResult.postValue(ProductsResult(success = popularProductsResult.data))
+                    }
                 }
             }
             _loadLiveData.postValue(false)

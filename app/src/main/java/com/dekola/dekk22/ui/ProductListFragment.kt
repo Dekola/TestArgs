@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.dekola.dekk22.data.model.ProductPresentation
@@ -17,10 +18,9 @@ import dagger.hilt.android.AndroidEntryPoint
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
 
-@AndroidEntryPoint
 class ProductListFragment : Fragment() {
 
-    private val viewModel: ProductViewModel by viewModels()
+    private val viewModel: ProductViewModel by activityViewModels()
     private val productListAdapter: ProductListAdapter by lazy { ProductListAdapter(::viewProductDetails) }
 
     private var _binding: FragmentProductListBinding? = null
@@ -40,6 +40,7 @@ class ProductListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        viewModel.testMessage = "Test message"
         setView()
         setObservers()
     }
